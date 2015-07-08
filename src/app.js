@@ -1,4 +1,4 @@
-angular.module('ionicApp', ['ionic', 'starter.controllers', 'starter.services'])
+angular.module('omw', ['ionic', 'starter.controllers', 'starter.services'])
 
 .constant('apiEndpoint', {
   url: /*gulp-replace-apiUrl*/'local'/*end*/
@@ -15,54 +15,101 @@ angular.module('ionicApp', ['ionic', 'starter.controllers', 'starter.services'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+
   $stateProvider
 
-    .state('tab', {
-      url: "/tab",
-      abstract: true,
-      templateUrl: "templates/tabs.html"
-    })
+  .state('login', {
+    url: '/login',
+    templateUrl: 'components/login/login.html',
+    controller: 'LoginCtrl as login'
+  })
 
-    .state('tab.dash', {
-      url: '/dash',
+  // setup an abstract state for the tabs directive
+  .state('tab', {
+    url: "/tab",
+    abstract: true,
+    templateUrl: "templates/tabs.html"
+  })
+
+  // Each tab has its own nav history stack:
+
+  .state('tab.home', {
+    url: '/home',
+    views: {
+      'tab-home': {
+        templateUrl: 'components/home/home.html',
+        controller: 'HomeCtrl as home'
+      }
+    }
+  })
+
+    .state('tab.omw-detail', {
+      url: '/home/:omwId',
       views: {
-        'tab-dash': {
-          templateUrl: 'templates/tab-dash.html',
-          controller: 'DashCtrl'
+        'tab-home': {
+          templateUrl: 'components/home/omw-detail/omw-detail.html',
+          controller: 'OmwDetailCtrl as omw'
         }
       }
     })
 
-    .state('tab.chats', {
-        url: '/chats',
-        views: {
-          'tab-chats': {
-            templateUrl: 'templates/tab-chats.html',
-            controller: 'ChatsCtrl'
-          }
-        }
-      })
-      .state('tab.chat-detail', {
-        url: '/chats/:chatId',
-        views: {
-          'tab-chats': {
-            templateUrl: 'templates/chat-detail.html',
-            controller: 'ChatDetailCtrl'
-          }
-        }
-      })
-
-    .state('tab.account', {
-      url: '/account',
+  .state('tab.map', {
+      url: '/map',
       views: {
-        'tab-account': {
-          templateUrl: 'templates/tab-account.html',
-          controller: 'AccountCtrl'
+        'tab-map': {
+          templateUrl: 'components/map/map.html',
+          controller: 'MapCtrl'
         }
       }
-    });
+    })
+  .state('tab.friends', {
+    url: '/friends',
+    views: {
+      'tab-friends': {
+        templateUrl: 'components/friends/friends.html',
+        controller: 'FriendsCtrl as friends'
+      }
+    }
+  })
+    .state('tab.friend-detail', {
+      url: '/friends/:friendId',
+      views: {
+        'tab-friends': {
+          templateUrl: 'components/friends/friend-detail/friend-detail.html',
+          controller: 'FriendDetailCtrl as friendDetail'
+        }
+      }
+  });
 
-  $urlRouterProvider.otherwise('/tab/dash');
+  // if none of the above states are matched, use this as the fallback
+  $urlRouterProvider.otherwise('/login');
+  $httpProvider.interceptors.push('authInterceptor');
+})
 
+.factory('authInterceptor', function($rootScope, $q, $location) {
+  return {
+    // Add authorization token to headers
+    request: function (config) {
+      config.headers = config.headers || {};
+      if (localStorage.getItem('token')) {
+        // config.headers.Authorization = 'Bearer ' + localStorage.getItem('cookie');
+        config.headers['Cookie'] = localStorage.getItem('cookie');
+      }
+      return config;
+    },
+
+    // Intercept 401s and redirect you to login
+    responseError: function(response) {
+      if(response.status === 401) {
+        $location.path('/');
+        // remove any stale tokens
+        localStorage.clear();
+        return $q.reject(response);
+      }
+      else {
+        return $q.reject(response);
+      }
+    }
+  };
 });

@@ -1,0 +1,13 @@
+<ion-view view-title="Home">
+  <ion-content>
+  	<ul class="list">
+		  <a href="#/tab/home/{{omw.id}}"
+		  	 class="item item-icon-left item-icon-right"
+		  	 ng-repeat="omw in home.omws track by $index">
+		    <i class="icon ion-home"></i>
+		    	{{omw.to}}
+		    <i class="icon ion-ios-navigate"></i>
+		  </a>
+		</ul>
+  </ion-content>
+</ion-view>

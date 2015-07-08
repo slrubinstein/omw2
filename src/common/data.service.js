@@ -1,4 +1,4 @@
-angular.module('ionic-app')
+angular.module('omw')
 	.factory('dataService', dataService);
 
 function dataService($http, apiEndpoint) {

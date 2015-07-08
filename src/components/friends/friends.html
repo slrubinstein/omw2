@@ -1,0 +1,13 @@
+<ion-view view-title="Friends">
+  <ion-content>
+  	<ul class="list">
+		  <a href="#/tab/friends/{{friend.id}}"
+		  	 class="item item-icon-left item-icon-right"
+		  	 ng-repeat="f in friends.friends">
+		    <i class="icon ion-home"></i>
+		    	{{f.username}}
+		    <i class="icon ion-ios-navigate"></i>
+		  </a>
+		</ul>
+  </ion-content>
+</ion-view>

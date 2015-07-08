@@ -103,7 +103,7 @@ gulp.task('css-lib', function() {
 gulp.task('templates', function () {
   return gulp.src('src/**/*.html')
     .pipe(templateCache({
-      module: 'ionic-app'
+      module: 'omw'
     }))
     .pipe(gulp.dest('src/public'));
 });
